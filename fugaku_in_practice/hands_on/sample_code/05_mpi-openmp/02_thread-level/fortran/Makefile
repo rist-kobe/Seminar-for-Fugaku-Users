@@ -1,0 +1,27 @@
+FC=mpifrtpx
+FCFLAGS=-g -O2
+LIB=
+
+.SUFFIXES: .o .F90
+
+SRC = main.F90
+
+OBJ = $(SRC:.F90=.o)
+
+EXE=chk_thd_level
+
+$(EXE): $(OBJ)
+	$(FC) $(FCFLAGS) -o $@ $(OBJ) $(LIB)
+
+main.o: main.F90
+
+.F90.o:
+	$(FC) $(FCFLAGS) -c $< -o $@
+
+.PHONY:
+clean:
+	rm -f *.o *.lst
+
+.PHONY:
+veryclean: clean
+	rm -f $(EXE)

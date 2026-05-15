@@ -1,0 +1,36 @@
+CC=FCC
+CFLAGS=-Nclang -g -std=gnu++14 -stdlib=libstdc++ -march=armv8.3-a+sve -msve-vector-bits=scalable \
+       -Ofast -fno-vectorize -fno-slp-vectorize -fstrict-aliasing -fno-omit-frame-pointer \
+       -ffj-no-interleave-loop-insns -ffj-no-swp -ffj-no-ocl \
+       -ffj-lst=t -Rpass=".*vectorize.*|.*unroll.*" \
+       -Rpass-missed=".*vectorize.*|.*unroll.*" \
+       -Rpass-analysis=".*vectorize.*|.*unroll.*|.*prefetch.*|regalloc" 
+LIB=
+
+.SUFFIXES: .o .cpp
+
+SRC = main.cpp mykernel.cpp timer.cpp
+
+OBJ = $(SRC:.cpp=.o)
+
+EXE=run.x
+
+$(EXE): $(OBJ)
+	$(CC) $(CFLAGS) -o $@ $(OBJ) $(LIB)
+
+mykernel.o: mykernel.cpp
+
+main.o: mykernel.o timer.o main.cpp
+
+timer.o: timer.cpp
+
+.cpp.o:
+	$(CC) $(CFLAGS) -c $< -o $@
+
+.PHONY:
+clean:
+	rm -f *.o *.lst
+
+.PHONY:
+veryclean: clean
+	rm -f $(EXE)

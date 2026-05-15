@@ -1,0 +1,24 @@
+CXX = mpiFCC
+CXXFLAGS = -Nclang -O3 -ffj-lst=t
+#####################################
+
+SRC = main.cpp
+
+OBJS = $(SRC:.cpp=.o)
+
+run.x : $(OBJS)
+	$(CXX) $(CXXFLAGS) $(OBJS) -o $@
+
+.cpp.o :
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+main.o:
+	$(CXX) $(CXXFLAGS) -c $*.cpp
+
+.PHONY: clean
+clean:
+	rm -f *.o *.lst
+
+.PHONY: veryclean
+veryclean:
+	rm -f *.x

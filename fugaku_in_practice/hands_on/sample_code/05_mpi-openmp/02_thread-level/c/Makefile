@@ -1,0 +1,27 @@
+CC=mpifccpx
+CFLAGS=-Nclang -g -std=gnu11 -O2 -msve-vector-bits=scalable
+LIB=
+
+.SUFFIXES: .o .c
+
+SRC = main.c
+
+OBJ = $(SRC:.c=.o)
+
+EXE=chk_thd_level
+
+$(EXE): $(OBJ)
+	$(CC) $(CFLAGS) -o $@ $(OBJ) $(LIB)
+
+main.o: main.c
+
+.c.o:
+	$(CC) $(CFLAGS) -c $< -o $@
+
+.PHONY:
+clean:
+	rm -f *.o *.lst
+
+.PHONY:
+veryclean: clean
+	rm -f $(EXE)

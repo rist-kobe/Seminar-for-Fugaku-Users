@@ -1,0 +1,35 @@
+CC=FCC
+CFLAGS=-g -Nclang -std=c++14 -stdlib=libstdc++ \
+        -march=armv8.3-a+sve -mcpu=a64fx -msve-vector-bits=512 \
+        -Ofast -fno-omit-frame-pointer -fvectorize -fno-slp-vectorize \
+        -ffj-no-interleave-loop-insns -ffj-no-swp -fstrict-aliasing  \
+        -ffj-lst=t -ffj-line \
+	-Rpass=".*vectorize.*|.*loop.*" \
+	-Rpass-missed=".*vectorize.*|.*loop.*" \
+	-Rpass-analysis=".*vectorize.*|.*loop.*"
+##########################################################################
+SRC = \
+	main.cpp \
+	mykernel.cpp
+
+OBJ = $(SRC:.cpp=.o)
+
+.SUFFIXES: .cpp .o
+
+run.x: $(OBJ)
+	$(CC) $(CFLAGS) $(OBJ) -o $@
+
+.cpp.o:
+	$(CC) $(CFLAGS) -c $< -o $@
+
+main.o: main.cpp
+
+mykernel.o: mykernel.cpp
+
+.PHONY: clean
+clean:
+	rm -f *.o *~ *.lst
+
+.PHONY: veryclean
+veryclean: clean
+	rm -f *.x

@@ -1,0 +1,39 @@
+FC=mpifrtpx
+FCFLAGS=-g -Kfast -Kopenmp -Ksimd=auto -Kswp -Kswp_policy=auto -Nlst=t -Koptmsg=2
+CC=fccpx
+CFLAGS=-Nclang -g -std=gnu11 -O2 -fopenmp
+LINK_FLAGS=$(FCFLAGS)
+LIB=
+
+.SUFFIXES: .o .F90 .c
+
+SRC = main.F90 util_mpi.F90
+SRC_C = timer.c
+
+OBJ = $(SRC:.F90=.o)
+OBJ_C = $(SRC_C:.c=.o)
+
+EXE=run.x
+
+$(EXE): $(OBJ) $(OBJ_C)
+	$(FC) $(LINK_FLAGS) -o $@ $(OBJ) $(OBJ_C) $(LIB)
+
+main.o: util_mpi.o main.F90
+
+util_mpi.o: util_mpi.F90
+
+timer.o: timer.c
+
+.F90.o:
+	$(FC) $(FCFLAGS) -c $< -o $@
+
+.c.o:
+	$(CC) $(CFLAGS) -c $< -o $@
+
+.PHONY:
+clean:
+	rm -f *.o *.mod *.lst
+
+.PHONY:
+veryclean: clean
+	rm -f $(EXE)

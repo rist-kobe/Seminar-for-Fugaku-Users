@@ -1,0 +1,36 @@
+CC = fccpx
+CFLAGS = -Nclang -march=armv8.3-a+sve -mcpu=a64fx -msve-vector-bits=512 -ffj-zfill -Ofast -fopenmp -Nlibomp -Nlst=t -DSTREAM_ARRAY_SIZE=100000000
+CFLAGS_TRAD = -KSVE -KA64FX -Kfast -Kzfill -Kopenmp -Nlibomp -Nlst=t -Koptmsg=2 -DSTREAM_ARRAY_SIZE=100000000
+
+FF = frtpx
+FFLAGS = -KSVE -KA64FX -Kfast -Kzfill -Kopenmp -Nlibomp -Nlst=t -Koptmsg=2
+
+all: stream_f stream_c stream_ctrad
+
+OBJ_F_DIR=Obj_f.fj_zfill
+OBJ_C_DIR=Obj_c.fj_zfill
+OBJ_CTRAD_DIR=Obj_ctrad.fj_zfill
+
+stream_f: stream.f mysecond.o
+	@mkdir -p $(OBJ_F_DIR) 
+	$(CC) $(CFLAGS) -c mysecond.c
+	$(FF) $(FFLAGS) -c stream.f
+	$(FF) $(FFLAGS) stream.o mysecond.o -o stream.exe
+	mv *.o $(OBJ_F_DIR)
+	mv *.lst $(OBJ_F_DIR)
+	mv stream.exe $(OBJ_F_DIR)
+
+stream_c: stream.c 
+	@mkdir -p $(OBJ_C_DIR) 
+	$(CC) $(CFLAGS) stream.c -o stream.exe
+	mv *.lst $(OBJ_C_DIR)
+	mv stream.exe $(OBJ_C_DIR) 
+
+stream_ctrad: stream.c 
+	@mkdir -p $(OBJ_CTRAD_DIR) 
+	$(CC) $(CFLAGS_TRAD) stream.c -o stream.exe
+	mv *.lst $(OBJ_CTRAD_DIR)
+	mv stream.exe $(OBJ_CTRAD_DIR) 
+
+clean:
+	rm -rf $(OBJ_F_DIR) $(OBJ_C_DIR) $(OBJ_CTRAD_DIR)

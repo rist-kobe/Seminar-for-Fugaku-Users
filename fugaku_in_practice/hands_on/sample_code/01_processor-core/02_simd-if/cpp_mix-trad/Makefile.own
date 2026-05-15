@@ -1,0 +1,41 @@
+CC=FCC
+CFLAGS=-Nclang -g -std=gnu++14 -stdlib=libstdc++ -march=armv8.3-a+sve -msve-vector-bits=scalable \
+       -Ofast -fvectorize -fstrict-aliasing -fno-omit-frame-pointer \
+       -ffj-interleave-loop-insns -ffj-no-swp -ffj-ocl \
+       -ffj-lst=t -Rpass=".*vectorize.*|.*unroll.*" \
+       -Rpass-missed=".*vectorize.*|.*unroll.*" \
+       -Rpass-analysis=".*vectorize.*|.*unroll.*|.*prefetch.*|regalloc" 
+CFLAGS_TRAD=-g -std=gnu++14 -v -KSVE -KA64FX  -Kfast -Ksimd=2 \
+            -Knoswp -Kstrict_aliasing -Kocl -Knoomitfp -Koptmsg=2 -Nlst=t
+LIB=
+
+.SUFFIXES: .o .cpp
+
+SRC = main.cpp mykernel.cpp optkernel.cpp timer.cpp
+
+OBJ = $(SRC:.cpp=.o)
+
+EXE=run.x
+
+$(EXE): $(OBJ)
+	$(CC) $(CFLAGS) -o $@ $(OBJ) $(LIB)
+
+mykernel.o: mykernel.cpp
+
+main.o: mykernel.o timer.o main.cpp
+
+timer.o: timer.cpp
+
+optkernel.o: optkernel.cpp
+	$(CC) $(CFLAGS_TRAD) -c  optkernel.cpp -o $@
+
+.cpp.o:
+	$(CC) $(CFLAGS) -c $< -o $@
+
+.PHONY:
+clean:
+	rm -f *.o *.lst
+
+.PHONY:
+veryclean: clean
+	rm -f $(EXE)

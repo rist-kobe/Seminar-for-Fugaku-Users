@@ -1,0 +1,27 @@
+CC=mpifcc
+CFLAGS=-Nclang -g -O2 -msve-vector-bits=scalable -fopenmp
+LINK_FLAGS=$(CFLAGS)
+LIB=
+
+.SUFFIXES: .o .c
+
+SRC= main.c
+OBJ= $(SRC:.c=.o)
+
+EXE=run.x
+
+$(EXE): $(OBJ)
+	$(CC) $(LINK_FLAGS) -o $@ $(OBJ) $(LIB)
+
+main.o: main.c
+
+.c.o:
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+.PHONY:
+clean:
+	rm -f *.o *.lst
+
+.PHONY:
+veryclean: clean
+	rm -f $(EXE)
