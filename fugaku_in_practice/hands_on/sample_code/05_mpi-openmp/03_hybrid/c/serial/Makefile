@@ -1,0 +1,31 @@
+CC=fccpx 
+CFLAGS=-Nclang -g -std=gnu11 -Ofast -msve-vector-bits=scalable -fvectorize -ffj-lst=t
+LIB=
+
+.SUFFIXES: .o .c
+
+SRC = main.c timer.c util.c
+
+OBJ = $(SRC:.c=.o)
+
+EXE=run.x
+
+$(EXE): $(OBJ)
+	$(CC) $(CFLAGS) -o $@ $(OBJ) $(LIB)
+
+main.o: timer.o util.o main.c
+
+timer.o: timer.c
+
+util.o: util.c
+
+.c.o:
+	$(CC) $(CFLAGS) -c $< -o $@
+
+.PHONY:
+clean:
+	rm -f *.o *.lst
+
+.PHONY:
+veryclean: clean
+	rm -f $(EXE)

@@ -1,0 +1,30 @@
+CC=FCCpx
+CFLAGS=-g -Nnoclang -V -std=c++14 -stdlib=libstdc++ \
+        -KA64FX -KSVE -Kfast -Knoomitfp -Knosimd -Kswp -Kswp_policy=auto -Kstrict_aliasing \
+        -Koptmsg=2 -Nlst=t -Nline 
+##########################################################################
+SRC = \
+	main.cpp \
+	mykernel.cpp
+
+OBJ = $(SRC:.cpp=.o)
+
+.SUFFIXES: .cpp .o
+
+run.x: $(OBJ)
+	$(CC) $(CFLAGS) $(OBJ) -o $@
+
+.cpp.o:
+	$(CC) $(CFLAGS) -c $< -o $@
+
+main.o: main.cpp
+
+mykernel.o: mykernel.cpp
+
+.PHONY: clean
+clean:
+	rm -f *.o *~ *.lst
+
+.PHONY: veryclean
+veryclean: clean
+	rm -f *.x

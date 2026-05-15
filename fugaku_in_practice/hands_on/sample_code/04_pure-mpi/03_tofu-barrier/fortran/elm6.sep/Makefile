@@ -1,0 +1,33 @@
+FC=mpifrtpx
+FOPT=-O2
+LIB=
+INC=
+FFLAGS=-g $(FOPT) $(INC) 
+
+CC=fccpx
+CFLAGS=-Nclang -g -O2
+
+SRC = main.F90
+
+OBJ  = $(SRC:.F90=.o)
+
+.SUFFIXES: .o .F90 .c
+
+run.x: timer.o $(OBJ)
+	$(FC) $(FFLAGS) timer.o $(OBJ) $(LIB) -o $@	
+
+main.o: 
+
+.F90.o:
+	$(FC) $(FFLAGS) -c $< -o $@
+
+timer.o:
+	$(CC) $(CFLAGS) -c timer.c -o $@
+
+.PHONY:
+clean:
+	rm -f *~ *.o *.mod
+
+.PHONY:
+veryclean: clean
+	rm -f *.x

@@ -1,0 +1,37 @@
+FC=frt
+FCFLAGS=-g -v -KSVE -KA64FX -Kfast -Ksimd=2 -Kswp -Kswp_policy=auto -Kocl \
+       -Knoomitfp -Koptmsg=2 -Nlst=t
+CC=fcc
+CFLAGS_O0 =-Nclang -g -O0
+LIB=
+
+.SUFFIXES: .o .F90 .c
+
+SRC = main.F90 mykernel.F90
+SRC_C = timer.c
+
+OBJ = $(SRC:.F90=.o)
+OBJ_C = $(SRC_C:.c=.o)
+
+EXE=run.x
+
+$(EXE): $(OBJ) $(OBJ_C)
+	$(FC) $(FCFLAG) -o $@ $(OBJ_C) $(OBJ) $(LIB)
+
+main.o: mykernel.o timer.o main.F90
+
+mykernel.o: mykernel.F90
+
+.F90.o:
+	$(FC) $(FCFLAGS) -c $< -o $@
+
+timer.o: timer.c
+	$(CC) $(CFLAGS_O0) -c timer.c -o $@
+
+.PHONY:
+clean:
+	rm -f *.o *.mod *.lst
+
+.PHONY:
+veryclean: clean
+	rm -f $(EXE)
